@@ -1,0 +1,14 @@
+/* style.css */
+body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    margin: 0;
+  }
+  
+  @media screen and (max-width: 768px) {
+    body {
+      background-color: #a58c8c;
+      padding: 10px;
+    }
+  }
+  
