@@ -1,42 +1,38 @@
+require('dotenv').config();
+
 const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
 
+
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
+
+app.use(express.json());
 
 // MongoDB Connection
-mongoose.connect('mongodb://localhost:27017/ecommerce')
-.then(() => console.log('Connected to MongoDB'))
-.catch((err) => console.error('MongoDB connection error:', err));
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log('Connected to MongoDB'))
+  .catch((err) => console.error('MongoDB connection error:', err));
+
 
 // Import your Product model
-const Product = require('./models/products');
+const Product = require('./models/products'); // assuming file is product.js
 
-// Insert a sample product (just once for testing)
-async function createSampleProduct() {
-  try {
-    const product = new Product({
-      name: 'Sample Product',
-      price: 99.99,
-      description: 'This is a sample product',
-    });
+// Import routes
+const authRoutes = require('./routes/auth');
+const cartRoutes = require('./routes/cart');
+const orderRoutes = require('./routes/order');
 
-    await product.save();
-    console.log('Sample product created!');
-  } catch (err) {
-    console.error('Error creating sample product:', err);
-  }
-}
+// Use routes
+app.use('/api/auth', authRoutes);
+app.use('/api/cart', cartRoutes);
+app.use('/api/orders', orderRoutes);
 
-// Call the function (ONLY ONCE!)
-createSampleProduct();
-
-
-// Serve static files
+// Serve static files (CSS, JS)
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Serve HTML files
+// Serve HTML pages
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
@@ -49,7 +45,7 @@ app.get('/products/:id', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'product-details.html'));
 });
 
-// Example API: Get all products from MongoDB
+// API Endpoint: Get all products from MongoDB
 app.get('/api/products', async (req, res) => {
   try {
     const products = await Product.find();
@@ -59,6 +55,6 @@ app.get('/api/products', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+// Start server
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+console.log(process.env.MONGO_URI);
