@@ -4,7 +4,7 @@ const Cart = require('../models/cart');
 const auth = require('../middleware/auth');
 
 // Add to cart (POST /api/cart)
-router.post('/', auth, async (req, res) => {
+router.post('/add', auth, async (req, res) => {
   try {
     const { productId, quantity } = req.body;
     let cart = await Cart.findOne({ userId: req.user.userId });

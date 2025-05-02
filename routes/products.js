@@ -15,6 +15,13 @@ router.get('/', async (req, res) => {
 // Create a new product (POST)
 router.post('/', async (req, res) => {
   try {
+    const { name, price, description } = req.body;
+
+    // Validation (ensure all necessary fields are provided)
+    if (!name || !price || !description) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
+
     const newProduct = new Product(req.body);
     await newProduct.save();
     res.status(201).json(newProduct);
@@ -31,6 +38,11 @@ router.put('/:id', async (req, res) => {
       { $set: req.body },
       { new: true }
     );
+
+    if (!updatedProduct) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
     res.json(updatedProduct);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -40,7 +52,12 @@ router.put('/:id', async (req, res) => {
 // Delete a product (DELETE)
 router.delete('/:id', async (req, res) => {
   try {
-    await Product.findByIdAndDelete(req.params.id);
+    const deletedProduct = await Product.findByIdAndDelete(req.params.id);
+
+    if (!deletedProduct) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
     res.json({ message: 'Product deleted successfully' });
   } catch (err) {
     res.status(500).json({ message: err.message });
