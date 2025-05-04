@@ -2,34 +2,33 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
-const cookieParser = require('cookie-parser'); // Import cookie-parser
+const cookieParser = require('cookie-parser');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
-app.use(cookieParser()); // Use cookie-parser middleware
+app.use(cookieParser());
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('Connected to MongoDB'))
   .catch((err) => console.error('MongoDB connection error:', err));
 
-// Import models (optional unless used directly here)
+  
+  // Import routes
 const Product = require('./models/products');
-
-// Import routes
 const authRoutes = require('./routes/auth');
 const cartRoutes = require('./routes/cart');
 const orderRoutes = require('./routes/order');
 const productRoutes = require('./routes/products');
-const auth = require('./middleware/auth');  // Import auth middleware
+const auth = require('./middleware/auth');
 
 // Use routes
-app.use('/api/auth', authRoutes);  // No auth required for login/register
-app.use('/api/cart', auth, cartRoutes);  // Auth required for cart routes
-app.use('/api/orders', auth, orderRoutes);  // Auth required for order routes
-app.use('/api/products', productRoutes);  // No auth required for products
+app.use('/api/auth', authRoutes);
+app.use('/api/cart', auth, cartRoutes);
+app.use('/api/orders', auth, orderRoutes);
+app.use('/api/products', productRoutes);
 
 
 // Serve static files (CSS, JS)
@@ -50,7 +49,7 @@ app.get('/products/:id', (req, res) => {
 
 // General Error Handling Middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);  // Log the error stack
+  console.error(err.stack);
   res.status(500).send('Something went wrong!');
 });
 
